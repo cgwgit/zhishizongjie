@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>启力订单管理系统</title>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+		<meta name="description" content="">
+		<link rel="stylesheet" href="__PUBLIC__/Admin/css/jquery-weui.css">
+		<link rel="stylesheet" href="__PUBLIC__/Admin/lib/weui.min.css">
+		<link rel="stylesheet" href="__PUBLIC__/Admin/css/public.css">
+	</head>
+
+	<body style="background: #fbfbfb;">
+		<div class="weui-search-bar" id="searchBar">
+			<form class="weui-search-bar__form" method="post" action="__CONTROLLER__/showList/">
+				<div class="weui-search-bar__box">
+                    <i class="weui-icon-search" id="tijiao" ></i>
+					<input type="search" class="weui-search-bar__input" id="searchInput" name="qname"placeholder="请输入企业名称"required="" value="<?php echo $huixian['qname'] ?>">
+				</div>
+			</form>
+		</div>
+	<if condition="empty($info) && isset($huixian['qname'])" >
+	   <div class="weui-panel weui-panel_access" id="detail">
+			<div class="weui-media-box weui-media-box_text">
+				<p class="weui-media-box__desc">您搜索的企业名称不存在</p>
+			</div>
+		</div>
+	</if>
+	<foreach name="info" item="v" >
+		<div class="weui-panel weui-panel_access">
+			<div class="weui-media-box weui-media-box_text">
+				<a href="__CONTROLLER__/detail/id/<?php echo $v['qid'] ?>" style="color:black;"><h4 class="weui-media-box__title"><?php echo $v['bianhao'] ?></h4>
+				<p class="weui-media-box__desc"><?php echo $v['qname'] ?></p>
+				</a>
+				<ul class="weui-media-box__info">
+					<li class="weui-media-box__info__meta">￥<?php echo $v['realmomey'] ?></li>
+					<li class="weui-media-box__info__meta"><?php echo date('Y-m-d',$v['date']) ?></li>
+					<li class="weui-media-box__info__meta weui-media-box__info__meta_extra">
+						<a href="__CONTROLLER__/editInfo/id/<?php echo $v['qid'] ?>/p/<?php echo $_GET['p'] ?>" style="color: #04BE02;">编辑</a>
+					</li>
+					<li class="weui-media-box__info__meta weui-media-box__info__meta_extra">
+						<a href="javascript:;" style="color: #04BE02;" onclick="activity_del(this,'<?php echo $v['qid'] ?>')">删除</a>
+					</li>
+					<!-- <li class="weui-media-box__info__meta weui-media-box__info__meta_extra">
+						<a href="__CONTROLLER__/detail/id/<?php echo $v['qid'] ?>" style="color: #04BE02;">查看详情</a>
+					</li> -->
+				</ul>
+			</div>
+		</div>
+	</foreach>
+	<!-- <div style="width: 100%;height: 40px;"> -->
+<!-- 	<div id="page" class="page" style="color: black;text-align: right;">
+			<?php echo $page ?>
+	</div> -->
+	<!-- </div> -->        
+<div class="box-add" id="detail">
+	<a href="__CONTROLLER__/addInfo" class="weui-btn weui-btn_primary" style="margin-top: 30px;">添加</a>
+</div>
+<div class="weui-loadmore">
+<i class="weui-loading"></i>
+<span class="weui-loadmore__tips">正在加载</span>
+</div>
+<script type="text/javascript" src="__PUBLIC__/Admin/lib/jquery-2.1.4.js"></script>
+<script type="text/javascript" src="__PUBLIC__/Admin/js/jquery-weui.js"></script>
+<script src="__PUBLIC__/Admin/lib/fastclick.js"></script>
+<!-- <script type="text/javascript" src="__PUBLIC__/Admin/lib/jquery/1.9.1/jquery.min.js"></script>  -->
+<script type="text/javascript" src="__PUBLIC__/Admin/lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="__PUBLIC__/Admin/static/h-ui/js/H-ui.min.js"></script> 
+<script type="text/javascript" src="__PUBLIC__/Admin/static/h-ui.admin/js/H-ui.admin.js"></script> 
+<!--/_footer /作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+<!-- <script type="text/javascript" src="__PUBLIC__/Admin/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+<script type="text/javascript" src="__PUBLIC__/Admin/lib/jquery.validation/1.14.0/jquery.validate.js"></script> 
+<script type="text/javascript" src="__PUBLIC__/Admin/lib/jquery.validation/1.14.0/validate-methods.js"></script> 
+<script type="text/javascript" src="__PUBLIC__/Admin/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript" src="__PUBLIC__/Admin/lib/webuploader/0.1.5/webuploader.min.js"></script> -->
+<script type="text/javascript">
+      var i = 2;
+      var loading = false;
+      $(document.body).infinite().on("infinite", function() {
+        if(loading) return;
+        loading = true;
+        setTimeout(function() {
+                $.ajax({
+        	url: '__CONTROLLER__/jiazai/',
+        	type: 'post',
+        	dataType: 'json',
+        	data: {page: i++,huixian:"<?php echo $huixian['qname'] ?>"},
+        	success:function(data){
+        		if(data.code == 0){
+              $(document.body).destroyInfinite();
+              // $(".weui-loadmore__tips").html("加载完成");
+              $(".weui-loadmore").hide();
+        		}else{
+        				$(data).each(function(index,el){
+        			   $("#detail").before('<div class="weui-panel weui-panel_access"><div class="weui-media-box weui-media-box_text"><a href="__CONTROLLER__/detail/id/'+el.qid+'style="color:black;"><h4 class="weui-media-box__title">'+el.bianhao+'</h4><p class="weui-media-box__desc">'+el.qname+'</p></a><ul class="weui-media-box__info"><li class="weui-media-box__info__meta">￥'+el.realmomey+'</li><li class="weui-media-box__info__meta"><?php echo date("Y-m-d",'+el.date+') ?></li><li class="weui-media-box__info__meta weui-media-box__info__meta_extra"><a href="__CONTROLLER__/editInfo/id/'+el.qid+' style="color: #04BE02;">编辑</a></li><li class="weui-media-box__info__meta weui-media-box__info__meta_extra"><a href="javascript:;" style="color: #04BE02;" onclick="activity_del(this,'+el.qid+')">删除</a></li></ul></div></div>');
+        		})
+        		}
+        	}
+        });
+          loading = false;
+        }, 500);
+      });
+</script>
+<script type="text/javascript">
+	$(function(){
+				$("#tijiao").click(function(){
+					// $("#myFormId").attr("action", "__CONTROLLER__/showList");
+					$("form").submit();
+				});
+			})
+</script>
+<script type="text/javascript">
+			   /*活动-删除*/
+			function activity_del(obj, id) {
+				layer.confirm('确认要删除吗？', function(index) {
+					$.ajax({
+						type: 'get',
+						url: '__CONTROLLER__/delInfo',
+						data:{'aid':id},
+						dataType: 'json',
+						success: function(data) {
+							if(data.code == 1){
+							$(obj).parents("#detail").remove();
+							layer.msg('已删除!', {
+								icon: 1,
+								time: 1000
+							// },
+							// 	function(){
+							// 		window.location.href=window.location.href;
+								});
+						}
+					},
+						error: function(data) {
+							console.log(data.msg);
+						},
+					});
+				});
+			}
+
+</script>
+</body>
+
+</html>
